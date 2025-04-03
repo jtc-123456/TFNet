@@ -346,7 +346,7 @@ def train(configParams, isTrain=True, isCalc=False):
         offset = 1
         for i in range(55):
             currentModuleSavePath = "module/bestMoudleNet_" + str(i + offset) + ".pth"
-            checkpoint = torch.load(currentModuleSavePath, map_location=torch.device('cpu'))
+            checkpoint = torch.load(currentModuleSavePath, map_location=torch.device('cpu'),weights_only=False)
             moduleNet.load_state_dict(checkpoint['moduleNet_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
