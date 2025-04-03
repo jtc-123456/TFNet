@@ -344,7 +344,7 @@ def train(configParams, isTrain=True, isCalc=False):
     else:
         bestWerScore = 65535
         offset = 1
-        for i in range(55):
+        for i in range(1):
             currentModuleSavePath = "module/bestMoudleNet_" + str(i + offset) + ".pth"
             checkpoint = torch.load(currentModuleSavePath, map_location=torch.device('cpu'),weights_only=False)
             moduleNet.load_state_dict(checkpoint['moduleNet_state_dict'])
@@ -357,6 +357,7 @@ def train(configParams, isTrain=True, isCalc=False):
             loss_value = []
             total_info = []
             total_sent = []
+            total_target=[]
 
             for Dict in tqdm(testLoader):
                 data = Dict["video"].to(device)
@@ -387,6 +388,9 @@ def train(configParams, isTrain=True, isCalc=False):
                     total_info += info
                     total_sent += pred
                 elif dataSetName == "CSL-Daily" or dataSetName == "CE-CSL":
+                    total_info += info
+                    total_sent += pred
+                    total_target+= label                 
                     werScore = WerScore([targetOutDataCTC], targetData, idx2word, batchSize)
                     werScoreSum = werScoreSum + werScore
 
@@ -417,7 +421,23 @@ def train(configParams, isTrain=True, isCalc=False):
                 ##########################################################################
                 DataProcessMoudle.write2file('./wer/' + "output-hypothesis-{}{:0>4d}.ctm".format('test', i+1), total_info,
                                              total_sent)
+            if dataSetName == "CE-CSL":
+              import pandas as pd
 
+              # # 把预测和真实标签转成字符串（用空格连接）
+              pred_strs = ["/".join([word[0] for word in seq] ) for seq in total_sent]
+              target_strs = ["/".join([idx2word[idx.item()] for idx in tgt]) for tgt in total_target]
+
+
+              # 保存为 CSV
+              df = pd.DataFrame({
+                  "video": total_info,
+                  "predict": pred_strs,
+                  "target":target_strs
+              })
+              save_csv_path = f"./predict_vs_target_{dataSetName.lower()}.csv"
+              df.to_csv(save_csv_path, index=False, encoding='utf-8-sig')
+              print(f"🔄 保存预测结果到: {save_csv_path}")
             print(f"testLoss: {currentLoss:.5f}, werScore: {werScore:.2f}")
             print(f"bestLoss: {bestLoss:.5f}, bestEpoch: {bestLossEpoch}, bestWerScore: {bestWerScore:.2f}, bestWerScoreEpoch: {bestWerScoreEpoch}")
 
