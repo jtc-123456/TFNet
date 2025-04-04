@@ -84,8 +84,9 @@ def main(dataPath, saveDataPath):
 
 
 if __name__ == '__main__':
-    dataPath = "/content/drive/MyDrive/gesture/CE-CSL/CE-CSL/video"
-    saveDataPath = "/content/drive/MyDrive/gesture/CE-CSL/CE-CSL/video2"
-
+    dataPath = "/content/drive/MyDrive/gesture/xiaomi/video"
+    saveDataPath = "/content/drive/MyDrive/gesture/xiaomi/video2"
+    # dataPath = "/content/drive/MyDrive/gesture/CE-CSL/CE-CSL/video"
+    # saveDataPath = "/content/drive/MyDrive/gesture/CE-CSL/CE-CSL/video2"
     seed_torch()
     main(dataPath, saveDataPath)

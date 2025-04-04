@@ -86,16 +86,16 @@ def train(configParams, isTrain=True, isCalc=False):
     ])
 
     # 导入数据
-    trainData = DataProcessMoudle.MyDataset(trainDataPath, trainLabelPath, word2idx, dataSetName, isTrain=True, transform=transform)
+    # trainData = DataProcessMoudle.MyDataset(trainDataPath, trainLabelPath, word2idx, dataSetName, isTrain=True, transform=transform)
 
-    validData = DataProcessMoudle.MyDataset(validDataPath, validLabelPath, word2idx, dataSetName, transform=transformTest)
+    # validData = DataProcessMoudle.MyDataset(validDataPath, validLabelPath, word2idx, dataSetName, transform=transformTest)
 
     testData = DataProcessMoudle.MyDataset(testDataPath, testLabelPath, word2idx, dataSetName, transform=transformTest)
 
-    trainLoader = DataLoader(dataset=trainData, batch_size=batchSize, shuffle=True, num_workers=numWorkers,
-                             pin_memory=pinmMemory, collate_fn=DataProcessMoudle.collate_fn, drop_last=True)
-    validLoader = DataLoader(dataset=validData, batch_size=1, shuffle=False, num_workers=numWorkers,
-                             pin_memory=pinmMemory, collate_fn=DataProcessMoudle.collate_fn, drop_last=True)
+    # trainLoader = DataLoader(dataset=trainData, batch_size=batchSize, shuffle=True, num_workers=numWorkers,
+    #                          pin_memory=pinmMemory, collate_fn=DataProcessMoudle.collate_fn, drop_last=True)
+    # validLoader = DataLoader(dataset=validData, batch_size=1, shuffle=False, num_workers=numWorkers,
+    #                          pin_memory=pinmMemory, collate_fn=DataProcessMoudle.collate_fn, drop_last=True)
     testLoader = DataLoader(dataset=testData, batch_size=1, shuffle=False, num_workers=numWorkers,
                             pin_memory=pinmMemory, collate_fn=DataProcessMoudle.collate_fn, drop_last=True)
 
@@ -128,6 +128,7 @@ def train(configParams, isTrain=True, isCalc=False):
 
     lastEpoch = -1
     if os.path.exists(currentModuleSavePath):
+        print("module path:    ",currentModuleSavePath)
         checkpoint = torch.load(currentModuleSavePath, map_location=torch.device('cpu'), weights_only=False)
         moduleNet.load_state_dict(checkpoint['moduleNet_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
@@ -372,6 +373,7 @@ def train(configParams, isTrain=True, isCalc=False):
                 batchSize = len(targetLengths)
 
                 with torch.no_grad():
+                    #print(data.shape)
                     logProbs1, logProbs2, logProbs3, logProbs4, logProbs5, lgt, x1, x2, x3 = moduleNet(data, dataLen, False)
 
                     logProbs1 = logSoftMax(logProbs1)
@@ -435,7 +437,7 @@ def train(configParams, isTrain=True, isCalc=False):
                   "predict": pred_strs,
                   "target":target_strs
               })
-              save_csv_path = f"./predict_vs_target_{dataSetName.lower()}.csv"
+              save_csv_path = f"result/{dataSetName.lower()}.csv"
               df.to_csv(save_csv_path, index=False, encoding='utf-8-sig')
               print(f"🔄 保存预测结果到: {save_csv_path}")
             print(f"testLoss: {currentLoss:.5f}, werScore: {werScore:.2f}")
